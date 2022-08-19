@@ -18,4 +18,4 @@ Folder Structure **Fire Classifier**:
 * Early_fire_detection_classifier.ipynb -Notebook with EDA and modeling parts
 * functions.py - A Py file with visualization and repeating functions. The main goal is to reduce the size of the notebook
 * requirements.txt - Requirements for functions.py
-* Model folder - contains the classifier model file
+* Model folder - contains the classifier model 
