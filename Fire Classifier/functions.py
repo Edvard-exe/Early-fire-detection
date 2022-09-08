@@ -37,7 +37,7 @@ import os
 import io
 
 
-def images_to_df(df: pd.DataFrame) -> pd.DataFrame:
+def images_to_df(df: pd.DataFrame, fire: str, none: str) -> pd.DataFrame:
     """
     Takes existing empty DataFrame.
     Selects images from the path.
@@ -45,7 +45,7 @@ def images_to_df(df: pd.DataFrame) -> pd.DataFrame:
     """
 
     for dirname, _, filenames in os.walk(
-        "/content/gdrive/MyDrive/Fire_data/train/fire"
+        f"/content/gdrive/MyDrive/Fire_data/{fire}"
     ):
         for filename in filenames:
             df = df.append(
@@ -56,7 +56,7 @@ def images_to_df(df: pd.DataFrame) -> pd.DataFrame:
             )
 
     for dirname, _, filenames in os.walk(
-        "/content/gdrive/MyDrive/Fire_data/train/none"
+        f"/content/gdrive/MyDrive/Fire_data/{none}"
     ):
         for filename in filenames:
             df = df.append(
@@ -69,43 +69,6 @@ def images_to_df(df: pd.DataFrame) -> pd.DataFrame:
     df = df.sample(frac=1).reset_index(drop=True)
 
     return df
-
-
-def test_create() -> pd.DataFrame():
-    """
-    Creates empty dataframe.
-    Selects images from the path.
-    Return DataFrame with fire and none test images.
-    """
-
-    test_df = pd.DataFrame(columns=["path", "label"])
-
-    for dirname, _, filenames in os.walk(
-        "/content/gdrive/MyDrive/Fire_data/valid/fire"
-    ):
-        for filename in filenames:
-            test_df = test_df.append(
-                pd.DataFrame(
-                    [[os.path.join(dirname, filename), "fire"]],
-                    columns=["path", "label"],
-                )
-            )
-
-    for dirname, _, filenames in os.walk(
-        "/content/gdrive/MyDrive/Fire_data/valid/none"
-    ):
-        for filename in filenames:
-            test_df = test_df.append(
-                pd.DataFrame(
-                    [[os.path.join(dirname, filename), "none"]],
-                    columns=["path", "label"],
-                )
-            )
-
-    test_df = test_df.sample(frac=1).reset_index(drop=True)
-
-    return test_df
-
 
 def scatt_plot(df: pd.DataFrame, x: str, y: str, hue: str, title: str) -> None:
     """
@@ -255,7 +218,7 @@ def line_plot(y1: list, y2: list, title: str, legend_list: list) -> None:
     plt.show()
 
 
-def conf_matrix(predict_label: list, true_label: list) -> None:
+def conf_matrix(true_label: list, predict_label: list) -> None:
     """
     Takes predicted and true values lists
     Returns confusion matrix
@@ -263,10 +226,10 @@ def conf_matrix(predict_label: list, true_label: list) -> None:
 
     plt.figure(figsize=(16, 6))
     plt.rc("font", size=9)
-    x_axis_labels = ["fire", "none"]
-    y_axis_labels = ["fire", "none"]
+    x_axis_labels = ["none", "fire"]
+    y_axis_labels = ["none", "fire"]
     sns.heatmap(
-        confusion_matrix(predict_label, true_label),
+        confusion_matrix(true_label, predict_label),
         annot=True,
         cmap="PRGn",
         cbar=False,
@@ -278,7 +241,6 @@ def conf_matrix(predict_label: list, true_label: list) -> None:
     plt.xlabel("")
     sns.despine()
     plt.show()
-
 
 def transform_image(image_bytes):
     my_transforms = T.Compose(
@@ -333,7 +295,7 @@ def showimg(images: list) -> None:
     Returns plot of misclassified images
     """
 
-    fig, ax = plt.subplots(1, 4, figsize=(15, 4))
+    fig, ax = plt.subplots(1, 5, figsize=(15, 4))
     counter = 0
     for image in images:
         mean = np.repeat([0.485, 0.456, 0.406], 224 * 224).reshape(3, 224, 224)
